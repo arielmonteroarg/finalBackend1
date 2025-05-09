@@ -1,0 +1,64 @@
+
+
+<h2>Agregar nuevo producto</h2>
+<form id="productForm">
+  <input type="text" name="title" placeholder="Nombre" required>
+  <input type="text" name="description" placeholder="Descripción" required>
+  <input type="text" name="code" placeholder="Código" required>
+  <input type="number" name="price" placeholder="Precio" required>
+  <input type="number" name="stock" placeholder="Stock" required>
+  <input type="text" name="category" placeholder="Categoría" required>
+  <input type="text" name="thumbnails" placeholder="Thumbnail (URL)">
+  <button type="submit">Agregar</button>
+</form>
+
+<h2>Lista de Productos en Tiempo Real</h2>
+
+<ul id="product-list">
+  {{#each products}}
+    <li>
+      {{this._id}} - {{this.title}} - {{this.stock}} - ${{this.price}}
+      <button onclick="deleteProduct('{{this._id}}')">Eliminar</button>
+    </li>
+  {{/each}}
+</ul>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  const form = document.getElementById('productForm');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData);
+    data.status = true;
+    data.thumbnails = data.thumbnails ? [data.thumbnails] : [];
+
+    const response = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    if (response.ok) form.reset();
+  });
+
+  socket.on('updateProducts', (products) => {
+    const list = document.getElementById('product-list');
+    list.innerHTML = products.map(product => `
+      <li>
+        ${product._id} - ${product.title} - ${product.stock} - $${product.price}
+        <button onclick="deleteProduct('${product._id}')">Eliminar</button>
+      </li>
+    `).join('');
+  });
+
+  async function deleteProduct(productId) {
+    if (confirm('¿Eliminar este producto?')) {
+      const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+      if (!response.ok) console.error('Error al eliminar');
+    }
+  }
+</script>

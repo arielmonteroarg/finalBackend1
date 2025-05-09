@@ -1,0 +1,31 @@
+<h1>Lista de Productos</h1>
+
+<ul id="product-list">
+  {{#each products}}
+    <li>
+      {{this.title}} - ${{this.price}} 
+      <a href="/api/products/detalleproduct/{{this._id}}">
+  <button>Ver</button>
+</a>
+    </li>
+  {{/each}}
+</ul>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  socket.on('updateProducts', (products) => {
+    const list = document.getElementById('product-list');
+    list.innerHTML = '';
+    products.forEach(p => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        ${p.title} - $${p.price}
+        <a href="/api/products/detalleproduct/{{this._id}}"><button>Ver</button></a>
+      `;
+      list.appendChild(li);
+    });
+  });
+</script>

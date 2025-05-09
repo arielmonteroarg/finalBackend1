@@ -1,0 +1,13 @@
+<h1>Registro de Usuario</h1>
+<form action="/usuarios/registro" method="POST">
+  <label>Nombre: <input type="text" name="nombre" required /></label>
+  <label>Email: <input type="email" name="email" required /></label>
+  <label>Contraseña: <input type="password" name="password" required /></label>
+  <label>Rol:
+    <select name="rol">
+      <option value="user">user</option>
+      <option value="admin">Admin</option>
+    </select>
+  </label><br><br>
+  <button type="submit">Registrarse</button>
+</form>
