@@ -5,27 +5,61 @@
     <li>
       {{this.title}} - ${{this.price}} 
       <a href="/api/products/detalleproduct/{{this._id}}">
-  <button>Ver</button>
-</a>
+        <button>Ver</button>
+      </a>
+
+      {{#if ../user}} 
+        <button onclick="modificarCarrito('{{this._id}}', 'agregar')">Agregar al carrito</button>
+      {{else}}
+        <a href="/api/usuarios/login">Ingrese con su usuario</a>
+      {{/if}}
     </li>
   {{/each}}
 </ul>
 
+<div class="pagination">
+  {{#if hasPrevPage}}
+    <a href="/api/products/?page={{prevPage}}"><button>Anterior</button></a>
+  {{/if}}
+
+  <span>Página {{currentPage}} de {{totalPages}}</span>
+
+  {{#if hasNextPage}}
+    <a href="/api/products/?page={{nextPage}}"><button>Siguiente</button></a>
+  {{/if}}
+</div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
+  const list = document.getElementById('product-list');
 
-  socket.on('updateProducts', (products) => {
-    const list = document.getElementById('product-list');
+  function renderProducts(products) {
     list.innerHTML = '';
     products.forEach(p => {
       const li = document.createElement('li');
       li.innerHTML = `
         ${p.title} - $${p.price}
-        <a href="/api/products/detalleproduct/{{this._id}}"><button>Ver</button></a>
+        <a href="/api/products/detalleproduct/${p._id}"><button>Ver</button></a>
+        <button onclick="modificarCarrito('${p._id}', 'agregar')">Agregar al carrito</button>
       `;
       list.appendChild(li);
     });
+  }
+
+  socket.on('updateProducts', (products) => {
+    renderProducts(products);
   });
+
+  function modificarCarrito(productId, accion) {
+    let method = 'POST';
+    let url = `/api/carts/${accion}/${productId}`;
+    if (accion === 'eliminar') method = 'DELETE';
+
+    fetch(url, { method })
+      .then(res => {
+        if (res.ok) alert('Producto agregado al carrito');
+        else alert('Error al modificar el carrito');
+      });
+  }
 </script>

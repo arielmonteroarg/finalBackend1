@@ -1,0 +1,46 @@
+<h1>Mi Carrito</h1>
+
+{{#if cart.products.length}}
+  <ul>
+    {{#each cart.products}}
+      <li>
+        <strong>{{this.product.title}}</strong> - ${{this.product.price}}  
+        <br>
+        Cantidad: {{this.quantity}}
+        <br>
+        <button onclick="modificarCarrito('{{this.product._id}}', 'aumentar')">+</button>
+        <button onclick="modificarCarrito('{{this.product._id}}', 'disminuir')">-</button>
+        <button onclick="modificarCarrito('{{this.product._id}}', 'eliminar')">Eliminar</button>
+      </li>
+      <hr>
+    {{/each}}
+  </ul>
+  <h3>Total: ${{total}}</h3>
+  <button onclick="vaciarCarrito()">Vaciar Carrito</button>
+{{else}}
+  <p>No tienes productos en el carrito.</p>
+{{/if}}
+
+<a href="/">Seguir comprando</a>
+
+
+<script>
+function modificarCarrito(productId, accion) {
+  let method = 'POST';
+  let url = `/api/carts/${accion}/${productId}`;
+  if (accion === 'eliminar') method = 'DELETE';
+
+  fetch(url, { method })
+    .then(res => {
+      if (res.ok) location.reload();
+      else alert('Error al modificar el carrito');
+    });
+}
+
+function vaciarCarrito() {
+  fetch('/api/carts/vaciar', { method: 'POST' })
+    .then(res => res.ok ? location.reload() : alert('Error al vaciar carrito'));
+}
+</script>
+
+

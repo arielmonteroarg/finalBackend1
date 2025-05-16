@@ -3,37 +3,49 @@
  <h2>{{product.title}}</h2>
 <p><strong>Precio:</strong> ${{product.price}}</p>
 <p><strong>Descripción:</strong> {{product.description}}</p>
+<p><strong>Código:</strong> {{product.code}}</p>
+<p><strong>Stock disponible:</strong> {{product.stock}}</p>
+<p><strong>Categoría:</strong> {{product.category}}</p>
+<p><strong>Estado:</strong> {{#if product.status}}Disponible{{else}}No disponible{{/if}}</p>
+
+{{!-- {{#if product.thumbnails.length}}
+  <p><strong>Imágenes:</strong></p>
+  <ul>
+    {{#each product.thumbnails}}
+      <li><img src="{{this}}" alt="imagen del producto" width="30"></li>
+    {{/each}}
+  </ul>
+{{else}}
+  <p><em>Sin imágenes</em></p>
+{{/if}}
 
 
 
-
+ --}}
 
         {{#if user}}
-<button onclick="agregarAlCarrito('{{product._id}}')">Agregar al carrito</button>
+  <button onclick="modificarCarrito('{{product._id}}', 'agregar')">Agregar al carrito</button>
+{{!--   <button onclick="modificarCarrito('{{product._id}}', 'aumentar')">+</button>
+  <button onclick="modificarCarrito('{{product._id}}', 'disminuir')">-</button>
+  <button onclick="modificarCarrito('{{product._id}}', 'eliminar')">Eliminar</button> --}}
         {{else}}
 
- <a href="/usuarios/registro">Registrarse</a>
+ <a href="/api/usuarios/login">Ingrese con su usuario</a>
         {{/if}}
 
 
-
-
-
 <script>
-  function agregarAlCarrito(productId) {
-    fetch(`/carrito/agregar/${productId}`, {
-      method: 'POST'
-    })
-    .then(response => {
-      if (response.ok) {
-        alert('Producto agregado al carrito');
-      } else {
-        alert('Error al agregar al carrito');
-      }
+function modificarCarrito(productId, accion) {
+  let method = 'POST';
+  let url = `/api/carts/${accion}/${productId}`;
+  if (accion === 'eliminar') method = 'DELETE';
+
+  fetch(url, { method })
+    .then(res => {
+      if (res.ok) alert('Carrito actualizado');
+      else alert('Error al modificar el carrito');
     });
-  }
+}
 </script>
-
-
 
 

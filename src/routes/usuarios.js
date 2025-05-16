@@ -28,7 +28,7 @@ router.post('/registro', validarUsuario, async (req, res) => {
   try {
     await userManager.createUser({ nombre, email, password, rol });
     console.log('🔵 Usuario guardado');
-    res.redirect('/usuarios/');
+    res.redirect('/api/usuarios/');
   } catch (error) {
     console.error('❌ Error al guardar el usuario:', error);
     res.status(500).send(error.message); // Usamos el mensaje de error del manager
@@ -52,13 +52,13 @@ router.post('/login', async (req, res) => {
     }
 
     req.session.user = {
-      id: usuario._id,
+      _id: usuario._id,
       name: usuario.nombre,
       email: usuario.email,
       rol: usuario.rol
     };
 
-    res.redirect('/realtimeproducts');
+    res.redirect('/');
   } catch (error) {
     res.status(500).send('Error en el servidor');
   }
@@ -68,18 +68,23 @@ router.post('/login', async (req, res) => {
 router.get('/logout', (req, res) => {
   req.session.destroy(err => {
     if (err) return res.status(500).send('Error al cerrar sesión');
-    res.redirect('/usuarios/login');
+    res.redirect('/api/usuarios/login');
   });
 });
 
-export default router;
 
-
-/* router.get('/test-session', (req, res) => {
+router.get('/test-session', (req, res) => {
   req.session.prueba = 'ok';
-  res.send('Session guardada');
+  res.send(req.session.user);
 });
 
 router.get('/ver-session', (req, res) => {
   res.send(req.session);
-}); */
+});
+
+
+
+
+
+export default router;
+

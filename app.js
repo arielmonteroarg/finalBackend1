@@ -13,8 +13,9 @@ import logger from './src//middlewares/logger.js';
 import conectarDB from './db.js';
 import productsRouter from './src/routes/products.js';
 import cartsRouter from './src/routes/carts.js';
-import viewsRouter from './src/routes/views.js';
+/* import viewsRouter from './src/routes/views.js'; */
 import usuariosRouter from './src/routes/usuarios.js';
+import MongoStore from 'connect-mongo';
 
 conectarDB();
 const app = express();
@@ -30,7 +31,7 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
-
+/* 
 app.use(session({
   secret: process.env.SESSION_SECRET || 'secretoSuperSecreto123',
   resave: false,
@@ -44,6 +45,23 @@ app.use(session({
 }));
 
 
+ */
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'secretoSuperSecreto123',
+  resave: false,
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI, // Usa la misma URI de conexión
+    ttl: 60 * 30 // Duración en segundos (30 minutos)
+  }),
+  cookie: {
+    secure: false, // true solo si usás HTTPS
+    httpOnly: true,
+    sameSite: 'strict',
+    maxAge: 1000 * 60 * 30 // 30 minutos en ms
+  }
+}));
 // Handlebars setup
 /* app.engine('handlebars', engine()); */
 app.engine('handlebars',engine({
@@ -58,10 +76,11 @@ app.set('views', path.join(__dirname, 'src', 'views'));
 app.locals.io = io;
 app.use(logger);
 // Rutas
-app.use('/', viewsRouter);
+/* app.use('/', viewsRouter); */
+app.use('/', productsRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
-app.use('/usuarios', usuariosRouter); 
+app.use('/api/usuarios', usuariosRouter); 
 
 
 // Socket.IO conexiones

@@ -23,6 +23,18 @@
   {{/each}}
 </ul>
 
+<div class="pagination">
+  {{#if hasPrevPage}}
+    <a href="/api/products/realtimeproducts/?page={{prevPage}}"><button>Anterior</button></a>
+  {{/if}}
+
+  <span>Página {{currentPage}} de {{totalPages}}</span>
+
+  {{#if hasNextPage}}
+    <a href="/api/products/realtimeproducts/?page={{nextPage}}"><button>Siguiente</button></a>
+  {{/if}}
+</div>
+
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
